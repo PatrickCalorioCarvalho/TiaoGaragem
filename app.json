@@ -36,7 +36,7 @@
         }
       ],
       "expo-font",
-      "expo-web-browser",
+      "@react-native-google-signin/google-signin",
       "expo-secure-store",
       [
         "expo-notifications",
@@ -46,7 +46,7 @@
       ]
     ],
     "extra": {
-      "googleAndroidClientId": "55277323397-s497dqj4m9td70l48h3ia0ibahfo64md.apps.googleusercontent.com",
+      "googleAndroidClientId": "55277323397-iujqaf06o7rc238rhhivbjaolckd6qlf.apps.googleusercontent.com",
       "googleIosClientId": ""
     }
   }
