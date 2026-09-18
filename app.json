@@ -5,11 +5,15 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "tiaogaragem",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tiaogaragem.app"
     },
     "android": {
+      "package": "com.tiaogaragem.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -20,6 +24,30 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O TiaoGaragem usa suas fotos para registrar o estado do pneu, água e óleo no checklist semanal.",
+          "cameraPermission": "O TiaoGaragem usa a câmera para fotografar o pneu, água e óleo no checklist semanal."
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "color": "#2563EB"
+        }
+      ]
+    ],
+    "extra": {
+      "googleAndroidClientId": "55277323397-s497dqj4m9td70l48h3ia0ibahfo64md.apps.googleusercontent.com",
+      "googleIosClientId": ""
     }
   }
 }
