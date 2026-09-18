@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TiaoGaragem</title>
+<meta name="description" content="App Android para controlar manutenção de carros e motos: checklist semanal, troca de óleo, documentos e backup." />
+<link rel="icon" href="assets/icon.png" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #F5F6F8;
+    --surface: #FFFFFF;
+    --border: #E2E5EA;
+    --text: #1C1F26;
+    --text-muted: #6B7280;
+    --primary: #2563EB;
+    --primary-text: #FFFFFF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161A;
+      --surface: #1C1F26;
+      --border: #2E323C;
+      --text: #F5F6F8;
+      --text-muted: #9AA1AC;
+      --primary: #3B82F6;
+      --primary-text: #FFFFFF;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding-inline: 20px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-block: 40px 24px;
+  }
+  header img {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  }
+  h1 { font-size: 28px; margin: 0; }
+  .tagline { color: var(--text-muted); margin: 4px 0 0; font-size: 15px; }
+  .cta {
+    display: block;
+    text-align: center;
+    background: var(--primary);
+    color: var(--primary-text);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 17px;
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-block: 8px 6px;
+  }
+  .cta:active { opacity: 0.85; }
+  .hint {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0 0 32px;
+  }
+  .hint a { color: var(--text-muted); }
+  .features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    display: grid;
+    gap: 12px;
+  }
+  .features li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 15px;
+    display: flex;
+    gap: 10px;
+  }
+  .features li span:first-child { flex-shrink: 0; }
+  footer {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+    padding-block: 8px 40px;
+  }
+  footer a { color: var(--text-muted); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="assets/icon.png" alt="Ícone do TiaoGaragem" />
+      <div>
+        <h1>TiaoGaragem</h1>
+        <p class="tagline">Manutenção do carro e da moto, sem esquecer nada</p>
+      </div>
+    </header>
+
+    <a class="cta" href="https://github.com/PatrickCalorioCarvalho/TiaoGaragem/releases/latest/download/TiaoGaragem.apk">
+      ⬇ Baixar APK (Android)
+    </a>
+    <p class="hint">
+      Instalação fora da Play Store — pode ser preciso liberar "instalar apps de fontes desconhecidas" no Android.
+      Veja todas as versões em <a href="https://github.com/PatrickCalorioCarvalho/TiaoGaragem/releases">Releases</a>.
+    </p>
+
+    <ul class="features">
+      <li><span>🚗</span><span>Cadastro de carros e motos com placa, RENAVAM, UF e odômetro</span></li>
+      <li><span>✅</span><span>Checklist semanal de pneu, água e óleo, com foto e status</span></li>
+      <li><span>🛢️</span><span>Controle de troca de óleo por km e por tempo, com alerta de vencimento</span></li>
+      <li><span>📄</span><span>Controle de IPVA e licenciamento com lembrete de vencimento</span></li>
+      <li><span>🔔</span><span>Notificações locais para nada passar batido</span></li>
+      <li><span>☁️</span><span>Backup e restauração dos dados pelo Google Drive</span></li>
+    </ul>
+
+    <footer>
+      Código aberto no <a href="https://github.com/PatrickCalorioCarvalho/TiaoGaragem">GitHub</a> · MIT License
+    </footer>
+  </div>
+</body>
+</html>
