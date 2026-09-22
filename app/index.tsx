@@ -10,7 +10,7 @@ import { isGoogleConfigured } from '../src/config/google';
 import { listVehicles } from '../src/db/vehicles';
 import { getLastOilChange } from '../src/db/oilChanges';
 import { getLastChecklist } from '../src/db/checklists';
-import { getMetadata, ONBOARDING_DONE_KEY } from '../src/db/metadata';
+import { getMetadata, ONBOARDING_DONE_KEY, setMetadata, VEHICLE_LIST_VIEW_MODE_KEY } from '../src/db/metadata';
 import { getOilChangeState, getChecklistState, getDocumentState, worstDocumentState } from '../src/utils/status';
 import {
   checklistUrgencyKind,
@@ -22,6 +22,8 @@ import {
   vehicleTypeIcon,
 } from '../src/utils/labels';
 import type { Vehicle } from '../src/types';
+
+type ViewMode = 'list' | 'grid';
 
 interface VehicleSummary {
   vehicle: Vehicle;
@@ -37,6 +39,7 @@ export default function VehicleListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [summaries, setSummaries] = useState<VehicleSummary[] | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   useEffect(() => {
     if (!isGoogleConfigured()) return;
@@ -44,6 +47,18 @@ export default function VehicleListScreen() {
       if (!done) router.replace('/onboarding');
     });
   }, []);
+
+  useEffect(() => {
+    getMetadata(VEHICLE_LIST_VIEW_MODE_KEY).then((value) => {
+      if (value === 'grid' || value === 'list') setViewMode(value);
+    });
+  }, []);
+
+  function toggleViewMode() {
+    const next: ViewMode = viewMode === 'list' ? 'grid' : 'list';
+    setViewMode(next);
+    setMetadata(VEHICLE_LIST_VIEW_MODE_KEY, next);
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -90,11 +105,16 @@ export default function VehicleListScreen() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Link href="/settings" asChild>
-              <Pressable hitSlop={8}>
-                <Ionicons name="settings-outline" size={22} color={colors.primary} />
+            <View style={styles.headerActions}>
+              <Pressable hitSlop={8} onPress={toggleViewMode}>
+                <Ionicons name={viewMode === 'list' ? 'grid-outline' : 'list-outline'} size={22} color={colors.primary} />
               </Pressable>
-            </Link>
+              <Link href="/settings" asChild>
+                <Pressable hitSlop={8}>
+                  <Ionicons name="settings-outline" size={22} color={colors.primary} />
+                </Pressable>
+              </Link>
+            </View>
           ),
         }}
       />
@@ -104,8 +124,9 @@ export default function VehicleListScreen() {
           <Text style={styles.emptyTitle}>Nenhum veículo cadastrado</Text>
           <Text style={styles.emptySubtitle}>Adicione seu carro ou moto para começar a acompanhar as manutenções.</Text>
         </View>
-      ) : (
+      ) : viewMode === 'list' ? (
         <FlatList
+          key="list"
           data={summaries}
           keyExtractor={(item) => item.vehicle.id}
           contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 88 }]}
@@ -116,11 +137,13 @@ export default function VehicleListScreen() {
                   {item.vehicle.photoUri ? (
                     <Image source={{ uri: item.vehicle.photoUri }} style={styles.vehiclePhoto} />
                   ) : (
-                    <MaterialCommunityIcons
-                      name={vehicleTypeIcon(item.vehicle.type)}
-                      size={28}
-                      color={colors.primary}
-                    />
+                    <View style={styles.vehiclePhotoPlaceholder}>
+                      <MaterialCommunityIcons
+                        name={vehicleTypeIcon(item.vehicle.type)}
+                        size={30}
+                        color={colors.primary}
+                      />
+                    </View>
                   )}
                   <View style={styles.cardHeaderText}>
                     <Text style={styles.vehicleName}>{item.vehicle.name}</Text>
@@ -145,6 +168,34 @@ export default function VehicleListScreen() {
             </Pressable>
           )}
         />
+      ) : (
+        <FlatList
+          key="grid"
+          data={summaries}
+          numColumns={2}
+          keyExtractor={(item) => item.vehicle.id}
+          contentContainerStyle={[styles.grid, { paddingBottom: insets.bottom + 88 }]}
+          columnWrapperStyle={styles.gridRow}
+          renderItem={({ item }) => (
+            <Pressable style={styles.gridCard} onPress={() => router.push(`/vehicle/${item.vehicle.id}`)}>
+              {item.vehicle.photoUri ? (
+                <Image source={{ uri: item.vehicle.photoUri }} style={styles.gridPhoto} />
+              ) : (
+                <View style={[styles.gridPhoto, styles.gridPhotoPlaceholder]}>
+                  <MaterialCommunityIcons name={vehicleTypeIcon(item.vehicle.type)} size={40} color={colors.primary} />
+                </View>
+              )}
+              <Text style={styles.gridName} numberOfLines={1}>
+                {item.vehicle.name}
+              </Text>
+              {item.vehicle.plate ? (
+                <Text style={styles.gridPlate} numberOfLines={1}>
+                  {item.vehicle.plate}
+                </Text>
+              ) : null}
+            </Pressable>
+          )}
+        />
       )}
 
       <Link href="/vehicle/new" asChild>
@@ -160,6 +211,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
   },
   list: {
     padding: 16,
@@ -177,10 +233,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   vehiclePhoto: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 64,
+    height: 64,
+    borderRadius: 14,
     backgroundColor: colors.neutralBg,
+  },
+  vehiclePhotoPlaceholder: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    backgroundColor: colors.neutralBg,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   vehicleName: {
     fontSize: 18,
@@ -201,6 +265,42 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   badgeCaption: {
+    fontSize: 12,
+    color: colors.textMuted,
+  },
+  grid: {
+    padding: 16,
+    gap: 12,
+  },
+  gridRow: {
+    gap: 12,
+  },
+  gridCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 10,
+    gap: 4,
+  },
+  gridPhoto: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 10,
+    backgroundColor: colors.neutralBg,
+  },
+  gridPhotoPlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gridName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: 4,
+  },
+  gridPlate: {
     fontSize: 12,
     color: colors.textMuted,
   },

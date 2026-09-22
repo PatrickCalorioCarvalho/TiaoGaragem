@@ -2,6 +2,7 @@ import { getDb } from './database';
 
 export const ONBOARDING_DONE_KEY = 'onboarding_done';
 export const LAST_BACKUP_AT_KEY = 'last_backup_at';
+export const VEHICLE_LIST_VIEW_MODE_KEY = 'vehicle_list_view_mode';
 
 export async function getMetadata(key: string): Promise<string | null> {
   const db = await getDb();

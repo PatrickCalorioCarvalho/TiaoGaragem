@@ -253,7 +253,15 @@ export default function NewVehicleScreen() {
           <>
             <Text style={styles.title}>Como quer chamar esse veículo?</Text>
             {fipeLabel && <Text style={styles.subtitle}>{fipeLabel}</Text>}
-            <FormField label="Apelido" value={name} onChangeText={setName} placeholder="Ex: Fiesta, CG 160" autoFocus />
+            <FormField
+              label="Apelido"
+              value={name}
+              onChangeText={setName}
+              placeholder="Ex: Fiesta, CG 160"
+              autoFocus
+              returnKeyType="next"
+              onSubmitEditing={() => name.trim() && goTo('identification')}
+            />
           </>
         )}
 
@@ -288,6 +296,8 @@ export default function NewVehicleScreen() {
               placeholder="Ex: 45000"
               keyboardType="number-pad"
               autoFocus
+              returnKeyType="next"
+              onSubmitEditing={() => odometer.trim() && goTo('photo')}
             />
             <FormField
               label="Intervalo de troca de óleo (km)"
