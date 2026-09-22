@@ -236,14 +236,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   vehiclePhoto: {
-    width: 110,
-    minHeight: 110,
+    width: 84,
+    minHeight: 84,
     alignSelf: 'stretch',
     backgroundColor: colors.neutralBg,
   },
   vehiclePhotoPlaceholder: {
-    width: 110,
-    minHeight: 110,
+    width: 84,
+    minHeight: 84,
     alignSelf: 'stretch',
     backgroundColor: colors.neutralBg,
     alignItems: 'center',
