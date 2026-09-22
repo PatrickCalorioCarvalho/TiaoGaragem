@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../../../src/components/Button';
 import { FormField } from '../../../src/components/FormField';
 import { getVehicle, updateVehicleDocuments } from '../../../src/db/vehicles';
+import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
 import { findState } from '../../../src/data/brazilStates';
 import { colors } from '../../../src/theme/colors';
 import { formatDateBR, parseDateBR } from '../../../src/utils/date';
@@ -64,6 +65,7 @@ export default function DocumentsScreen() {
           licensingIso,
         ),
       ]);
+      refreshMaintenanceWidget();
       router.back();
     } finally {
       setSaving(false);
