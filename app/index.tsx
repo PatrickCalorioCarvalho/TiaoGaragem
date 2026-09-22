@@ -235,12 +235,14 @@ const styles = StyleSheet.create({
   },
   vehiclePhoto: {
     width: 112,
-    height: 112,
+    minHeight: 112,
+    alignSelf: 'stretch',
     backgroundColor: colors.neutralBg,
   },
   vehiclePhotoPlaceholder: {
     width: 112,
-    height: 112,
+    minHeight: 112,
+    alignSelf: 'stretch',
     backgroundColor: colors.neutralBg,
     alignItems: 'center',
     justifyContent: 'center',
