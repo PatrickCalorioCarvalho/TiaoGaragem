@@ -2,6 +2,7 @@ import { listVehicles } from '../db/vehicles';
 import { getLastOilChange } from '../db/oilChanges';
 import { getLastChecklist } from '../db/checklists';
 import { getOilChangeState, getChecklistState, getDocumentState } from '../utils/status';
+import { getWidgetPhotoDataUri } from './widgetPhoto';
 import type { ChecklistState, DocumentState, MaintenanceState } from '../types';
 
 export interface NextMaintenanceInfo {
@@ -9,9 +10,11 @@ export interface NextMaintenanceInfo {
   vehicleName: string;
   title: string;
   detail: string;
+  photoDataUri: string | null;
 }
 
-interface Candidate extends NextMaintenanceInfo {
+interface Candidate extends Omit<NextMaintenanceInfo, 'photoDataUri'> {
+  photoUri: string | null;
   rank: number;
   urgencyScore: number;
 }
@@ -66,6 +69,7 @@ export async function computeNextMaintenance(): Promise<NextMaintenanceInfo | nu
       candidates.push({
         vehicleId: vehicle.id,
         vehicleName: vehicle.name,
+        photoUri: vehicle.photoUri,
         title: 'Troca de óleo',
         detail: oilDetail(oilState),
         rank: rankOf(oilState.urgency),
@@ -78,6 +82,7 @@ export async function computeNextMaintenance(): Promise<NextMaintenanceInfo | nu
       candidates.push({
         vehicleId: vehicle.id,
         vehicleName: vehicle.name,
+        photoUri: vehicle.photoUri,
         title: 'Checklist semanal',
         detail: checklistDetail(checklistState),
         rank: rankOf(checklistState.urgency),
@@ -90,6 +95,7 @@ export async function computeNextMaintenance(): Promise<NextMaintenanceInfo | nu
       candidates.push({
         vehicleId: vehicle.id,
         vehicleName: vehicle.name,
+        photoUri: vehicle.photoUri,
         title: 'IPVA',
         detail: documentDetail(ipvaState, 'IPVA'),
         rank: rankOf(ipvaState.urgency),
@@ -102,6 +108,7 @@ export async function computeNextMaintenance(): Promise<NextMaintenanceInfo | nu
       candidates.push({
         vehicleId: vehicle.id,
         vehicleName: vehicle.name,
+        photoUri: vehicle.photoUri,
         title: 'Licenciamento',
         detail: documentDetail(licensingState, 'Licenciamento'),
         rank: rankOf(licensingState.urgency),
@@ -114,5 +121,12 @@ export async function computeNextMaintenance(): Promise<NextMaintenanceInfo | nu
 
   candidates.sort((a, b) => b.rank - a.rank || a.urgencyScore - b.urgencyScore);
   const [best] = candidates;
-  return { vehicleId: best.vehicleId, vehicleName: best.vehicleName, title: best.title, detail: best.detail };
+  const photoDataUri = await getWidgetPhotoDataUri(best.photoUri);
+  return {
+    vehicleId: best.vehicleId,
+    vehicleName: best.vehicleName,
+    title: best.title,
+    detail: best.detail,
+    photoDataUri,
+  };
 }
