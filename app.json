@@ -43,6 +43,21 @@
         {
           "color": "#2563EB"
         }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "NextMaintenance",
+              "label": "Próxima manutenção",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "description": "Mostra o veículo com a manutenção mais urgente",
+              "updatePeriodMillis": 3600000
+            }
+          ]
+        }
       ]
     ],
     "extra": {

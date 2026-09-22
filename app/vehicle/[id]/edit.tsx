@@ -3,6 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { VehicleForm } from '../../../src/components/VehicleForm';
 import { deleteVehicle, getVehicle, NewVehicleInput, updateVehicle } from '../../../src/db/vehicles';
+import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
 import { colors } from '../../../src/theme/colors';
 import {
   cancelDocumentReminders,
@@ -22,12 +23,14 @@ export default function EditVehicleScreen() {
 
   async function handleSubmit(input: NewVehicleInput) {
     await updateVehicle(id, input);
+    refreshMaintenanceWidget();
     router.back();
   }
 
   async function handleDelete() {
     await Promise.all([cancelDocumentReminders(ipvaMetadataKey(id)), cancelDocumentReminders(licensingMetadataKey(id))]);
     await deleteVehicle(id);
+    refreshMaintenanceWidget();
     router.replace('/');
   }
 

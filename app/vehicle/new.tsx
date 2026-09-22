@@ -12,6 +12,7 @@ import { VehicleTypePicker } from '../../src/components/VehicleTypePicker';
 import { colors } from '../../src/theme/colors';
 import { vehicleTypeLabel } from '../../src/utils/labels';
 import { createVehicle } from '../../src/db/vehicles';
+import { refreshMaintenanceWidget } from '../../src/widgets/refreshWidget';
 import { listBrands, listModels, listYears, type FipeOption } from '../../src/api/fipe';
 import type { VehicleType } from '../../src/types';
 
@@ -166,6 +167,7 @@ export default function NewVehicleScreen() {
         fipeYearCode: fipeYear?.codigo ?? null,
         fipeLabel,
       });
+      refreshMaintenanceWidget();
       router.replace(`/vehicle/${vehicle.id}`);
     } finally {
       setSaving(false);

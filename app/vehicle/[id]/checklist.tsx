@@ -7,6 +7,7 @@ import { FormField } from '../../../src/components/FormField';
 import { ItemStatusPicker } from '../../../src/components/ItemStatusPicker';
 import { PhotoField } from '../../../src/components/PhotoField';
 import { createChecklist } from '../../../src/db/checklists';
+import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
 import { formatDateBR, parseDateBR, todayIso } from '../../../src/utils/date';
 import type { ItemStatus } from '../../../src/types';
 
@@ -44,6 +45,7 @@ export default function ChecklistScreen() {
         oilPhotoUri: oilPhoto,
         notes: notes.trim() || undefined,
       });
+      refreshMaintenanceWidget();
       router.back();
     } finally {
       setSaving(false);

@@ -6,6 +6,7 @@ import { Button } from '../../../src/components/Button';
 import { FormField } from '../../../src/components/FormField';
 import { createOilChange } from '../../../src/db/oilChanges';
 import { getVehicle } from '../../../src/db/vehicles';
+import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
 import { colors } from '../../../src/theme/colors';
 import { formatDateBR, parseDateBR, todayIso } from '../../../src/utils/date';
 import type { Vehicle } from '../../../src/types';
@@ -43,6 +44,7 @@ export default function OilChangeScreen() {
     setSaving(true);
     try {
       await createOilChange(vehicle, { date: isoDate, odometer: parsedOdometer, notes: notes.trim() || undefined });
+      refreshMaintenanceWidget();
       router.back();
     } finally {
       setSaving(false);
