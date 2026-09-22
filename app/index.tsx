@@ -148,7 +148,7 @@ export default function VehicleListScreen() {
       )}
 
       <Link href="/vehicle/new" asChild>
-        <Pressable style={[styles.fab, { bottom: insets.bottom + 20 }]}>
+        <Pressable style={{ ...styles.fab, bottom: insets.bottom + 20 }}>
           <MaterialCommunityIcons name="plus" size={28} color={colors.primaryText} />
         </Pressable>
       </Link>
