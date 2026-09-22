@@ -14,7 +14,20 @@ export interface Vehicle {
   oilIntervalMonths: number;
   ipvaDueDate: string | null;
   licensingDueDate: string | null;
+  photoUri: string | null;
+  fipeBrandCode: string | null;
+  fipeModelCode: string | null;
+  fipeYearCode: string | null;
+  fipeLabel: string | null;
   createdAt: string;
+}
+
+export interface FipeValue {
+  id: string;
+  vehicleId: string;
+  referenceMonth: string;
+  value: number;
+  fetchedAt: string;
 }
 
 export interface OilChange {

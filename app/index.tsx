@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, Stack, useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from '../src/components/Card';
@@ -34,6 +35,7 @@ interface VehicleSummary {
 
 export default function VehicleListScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [summaries, setSummaries] = useState<VehicleSummary[] | null>(null);
 
   useEffect(() => {
@@ -106,16 +108,20 @@ export default function VehicleListScreen() {
         <FlatList
           data={summaries}
           keyExtractor={(item) => item.vehicle.id}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 88 }]}
           renderItem={({ item }) => (
             <Pressable onPress={() => router.push(`/vehicle/${item.vehicle.id}`)}>
               <Card style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <MaterialCommunityIcons
-                    name={vehicleTypeIcon(item.vehicle.type)}
-                    size={28}
-                    color={colors.primary}
-                  />
+                  {item.vehicle.photoUri ? (
+                    <Image source={{ uri: item.vehicle.photoUri }} style={styles.vehiclePhoto} />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name={vehicleTypeIcon(item.vehicle.type)}
+                      size={28}
+                      color={colors.primary}
+                    />
+                  )}
                   <View style={styles.cardHeaderText}>
                     <Text style={styles.vehicleName}>{item.vehicle.name}</Text>
                     {item.vehicle.plate ? <Text style={styles.vehiclePlate}>{item.vehicle.plate}</Text> : null}
@@ -142,7 +148,7 @@ export default function VehicleListScreen() {
       )}
 
       <Link href="/vehicle/new" asChild>
-        <Pressable style={styles.fab}>
+        <Pressable style={[styles.fab, { bottom: insets.bottom + 20 }]}>
           <MaterialCommunityIcons name="plus" size={28} color={colors.primaryText} />
         </Pressable>
       </Link>
@@ -169,6 +175,12 @@ const styles = StyleSheet.create({
   },
   cardHeaderText: {
     flex: 1,
+  },
+  vehiclePhoto: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: colors.neutralBg,
   },
   vehicleName: {
     fontSize: 18,

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../../../src/components/Button';
 import { FormField } from '../../../src/components/FormField';
@@ -17,6 +18,7 @@ import type { Vehicle } from '../../../src/types';
 export default function DocumentsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [ipvaDueDate, setIpvaDueDate] = useState('');
   const [licensingDueDate, setLicensingDueDate] = useState('');
@@ -77,7 +79,10 @@ export default function DocumentsScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={styles.subtitle}>
         As datas variam por estado e mudam todo ano — confirme sempre no site oficial antes de pagar.
       </Text>

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Button } from '../src/components/Button';
 import { Card } from '../src/components/Card';
@@ -29,6 +30,7 @@ export default function SettingsScreen() {
 }
 
 function GoogleBackupSettings() {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState<string | null>(null);
   const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -97,7 +99,7 @@ function GoogleBackupSettings() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}>
       <Card style={styles.card}>
         <Text style={styles.title}>Conta Google</Text>
         {checkingAuth ? (

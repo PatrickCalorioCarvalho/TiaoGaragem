@@ -50,11 +50,27 @@ async function migrate(db: SQLite.SQLiteDatabase) {
       key TEXT PRIMARY KEY NOT NULL,
       value TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS fipe_values (
+      id TEXT PRIMARY KEY NOT NULL,
+      vehicle_id TEXT NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+      reference_month TEXT NOT NULL,
+      value REAL NOT NULL,
+      fetched_at TEXT NOT NULL,
+      UNIQUE (vehicle_id, reference_month)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_fipe_values_vehicle ON fipe_values(vehicle_id, reference_month ASC);
   `);
 
   await ensureColumn(db, 'vehicles', 'uf', 'TEXT');
   await ensureColumn(db, 'vehicles', 'ipva_due_date', 'TEXT');
   await ensureColumn(db, 'vehicles', 'licensing_due_date', 'TEXT');
+  await ensureColumn(db, 'vehicles', 'photo_uri', 'TEXT');
+  await ensureColumn(db, 'vehicles', 'fipe_brand_code', 'TEXT');
+  await ensureColumn(db, 'vehicles', 'fipe_model_code', 'TEXT');
+  await ensureColumn(db, 'vehicles', 'fipe_year_code', 'TEXT');
+  await ensureColumn(db, 'vehicles', 'fipe_label', 'TEXT');
 }
 
 async function ensureColumn(

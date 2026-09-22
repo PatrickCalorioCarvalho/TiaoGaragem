@@ -1,13 +1,17 @@
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button } from '../../../src/components/Button';
 import { Card } from '../../../src/components/Card';
 import { StatusBadge } from '../../../src/components/StatusBadge';
+import { FipeChart } from '../../../src/components/FipeChart';
 import { getVehicle } from '../../../src/db/vehicles';
 import { listOilChanges } from '../../../src/db/oilChanges';
 import { listChecklists } from '../../../src/db/checklists';
+import { listFipeValues, upsertFipeValue } from '../../../src/db/fipeValues';
+import { getPrice, parseFipeValue } from '../../../src/api/fipe';
 import { colors } from '../../../src/theme/colors';
 import { formatDateBR } from '../../../src/utils/date';
 import { getChecklistState, getDocumentState, getOilChangeState } from '../../../src/utils/status';
@@ -23,14 +27,23 @@ import {
   vehicleTypeIcon,
   vehicleTypeLabel,
 } from '../../../src/utils/labels';
-import type { Checklist, OilChange, Vehicle } from '../../../src/types';
+import type { Checklist, FipeValue, OilChange, Vehicle } from '../../../src/types';
+
+function shouldRefetchFipe(values: FipeValue[]): boolean {
+  if (values.length === 0) return true;
+  const lastFetch = values[values.length - 1].fetchedAt.slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
+  return lastFetch !== today;
+}
 
 export default function VehicleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [oilChanges, setOilChanges] = useState<OilChange[]>([]);
   const [checklists, setChecklists] = useState<Checklist[]>([]);
+  const [fipeValues, setFipeValues] = useState<FipeValue[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -41,6 +54,20 @@ export default function VehicleDetailScreen() {
         setVehicle(v);
         setOilChanges(changes);
         setChecklists(lists);
+
+        if (!v?.fipeBrandCode || !v.fipeModelCode || !v.fipeYearCode) return;
+        let values = await listFipeValues(id);
+        if (!cancelled) setFipeValues(values);
+        if (shouldRefetchFipe(values)) {
+          try {
+            const price = await getPrice(v.type, v.fipeBrandCode, v.fipeModelCode, v.fipeYearCode);
+            await upsertFipeValue(id, price.MesReferencia, parseFipeValue(price.Valor), new Date().toISOString());
+            values = await listFipeValues(id);
+            if (!cancelled) setFipeValues(values);
+          } catch {
+            // Offline or FIPE unavailable: keep showing whatever history we already have.
+          }
+        }
       })();
       return () => {
         cancelled = true;
@@ -77,9 +104,13 @@ export default function VehicleDetailScreen() {
           ),
         }}
       />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 24 }]}>
         <Card style={styles.headerCard}>
-          <MaterialCommunityIcons name={vehicleTypeIcon(vehicle.type)} size={32} color={colors.primary} />
+          {vehicle.photoUri ? (
+            <Image source={{ uri: vehicle.photoUri }} style={styles.vehiclePhoto} />
+          ) : (
+            <MaterialCommunityIcons name={vehicleTypeIcon(vehicle.type)} size={32} color={colors.primary} />
+          )}
           <View style={{ flex: 1 }}>
             <Text style={styles.vehicleName}>{vehicle.name}</Text>
             <Text style={styles.vehicleMeta}>
@@ -88,6 +119,25 @@ export default function VehicleDetailScreen() {
             </Text>
           </View>
         </Card>
+
+        {vehicle.fipeLabel && (
+          <Card style={styles.statusCard}>
+            <Text style={styles.statusTitle}>Valor FIPE</Text>
+            <Text style={styles.statusDetail}>{vehicle.fipeLabel}</Text>
+            {fipeValues.length > 0 ? (
+              fipeValues.length >= 2 ? (
+                <FipeChart data={fipeValues} />
+              ) : (
+                <Text style={styles.statusDetail}>
+                  {fipeValues[0].value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {'\n'}Ainda não há histórico suficiente para o gráfico — volte no próximo mês.
+                </Text>
+              )
+            ) : (
+              <Text style={styles.statusDetail}>Consultando a tabela FIPE...</Text>
+            )}
+          </Card>
+        )}
 
         <Card style={styles.statusCard}>
           <View style={styles.statusHeader}>
@@ -210,6 +260,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  vehiclePhoto: {
+    width: 56,
+    height: 56,
+    borderRadius: 12,
+    backgroundColor: colors.neutralBg,
   },
   vehicleName: {
     fontSize: 20,

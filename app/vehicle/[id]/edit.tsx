@@ -53,6 +53,11 @@ export default function EditVehicleScreen() {
         odometer: vehicle.odometer,
         oilIntervalKm: vehicle.oilIntervalKm,
         oilIntervalMonths: vehicle.oilIntervalMonths,
+        photoUri: vehicle.photoUri,
+        fipeBrandCode: vehicle.fipeBrandCode,
+        fipeModelCode: vehicle.fipeModelCode,
+        fipeYearCode: vehicle.fipeYearCode,
+        fipeLabel: vehicle.fipeLabel,
       }}
     />
   );

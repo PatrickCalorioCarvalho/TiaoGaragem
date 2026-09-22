@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../../../src/components/Button';
 import { FormField } from '../../../src/components/FormField';
@@ -12,6 +13,7 @@ import type { ItemStatus } from '../../../src/types';
 export default function ChecklistScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [date, setDate] = useState(formatDateBR(todayIso()));
   const [tireStatus, setTireStatus] = useState<ItemStatus>('ok');
@@ -49,7 +51,10 @@ export default function ChecklistScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}
+      keyboardShouldPersistTaps="handled"
+    >
       <FormField label="Data do checklist" value={date} onChangeText={setDate} placeholder="dd/mm/aaaa" />
 
       <ItemStatusPicker label="Pneus" value={tireStatus} onChange={setTireStatus} />

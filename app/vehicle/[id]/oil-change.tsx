@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button } from '../../../src/components/Button';
 import { FormField } from '../../../src/components/FormField';
@@ -12,6 +13,7 @@ import type { Vehicle } from '../../../src/types';
 export default function OilChangeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [date, setDate] = useState(formatDateBR(todayIso()));
   const [odometer, setOdometer] = useState('');
@@ -56,7 +58,10 @@ export default function OilChangeScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={styles.subtitle}>
         Próxima troca prevista para daqui {vehicle.oilIntervalKm} km ou {vehicle.oilIntervalMonths} meses.
       </Text>

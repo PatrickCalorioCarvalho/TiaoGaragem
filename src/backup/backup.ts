@@ -2,8 +2,9 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { deleteAllVehicles, insertVehicleRaw, listVehicles } from '../db/vehicles';
 import { insertOilChangeRaw, listAllOilChanges } from '../db/oilChanges';
 import { insertChecklistRaw, listAllChecklists } from '../db/checklists';
+import { insertFipeValueRaw, listAllFipeValues } from '../db/fipeValues';
 import { downloadAppDataFileBytes, downloadAppDataFileText, listAppDataFiles, saveAppDataFile } from './googleDrive';
-import type { Checklist, ItemStatus, OilChange, Vehicle } from '../types';
+import type { Checklist, FipeValue, ItemStatus, OilChange, Vehicle, VehicleType } from '../types';
 
 const MANIFEST_NAME = 'tiaogaragem-backup.json';
 const photosDirectory = new Directory(Paths.document, 'photos');
@@ -22,12 +23,33 @@ interface BackupChecklist {
   createdAt: string;
 }
 
+interface BackupVehicle {
+  id: string;
+  name: string;
+  type: VehicleType;
+  plate: string | null;
+  renavam: string | null;
+  uf: string | null;
+  odometer: number;
+  oilIntervalKm: number;
+  oilIntervalMonths: number;
+  ipvaDueDate: string | null;
+  licensingDueDate: string | null;
+  photoName: string | null;
+  fipeBrandCode: string | null;
+  fipeModelCode: string | null;
+  fipeYearCode: string | null;
+  fipeLabel: string | null;
+  createdAt: string;
+}
+
 interface BackupManifest {
-  version: 1;
+  version: 1 | 2;
   exportedAt: string;
-  vehicles: Vehicle[];
+  vehicles: BackupVehicle[];
   oilChanges: OilChange[];
   checklists: BackupChecklist[];
+  fipeValues?: FipeValue[];
 }
 
 function photoNameOf(uri: string | null): string | null {
@@ -49,16 +71,35 @@ export async function getBackupInfo(): Promise<BackupInfo | null> {
 }
 
 export async function performBackup(): Promise<{ photosUploaded: number }> {
-  const [vehicles, oilChanges, checklists] = await Promise.all([
+  const [vehicles, oilChanges, checklists, fipeValues] = await Promise.all([
     listVehicles(),
     listAllOilChanges(),
     listAllChecklists(),
+    listAllFipeValues(),
   ]);
 
   const manifest: BackupManifest = {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
-    vehicles,
+    vehicles: vehicles.map((vehicle) => ({
+      id: vehicle.id,
+      name: vehicle.name,
+      type: vehicle.type,
+      plate: vehicle.plate,
+      renavam: vehicle.renavam,
+      uf: vehicle.uf,
+      odometer: vehicle.odometer,
+      oilIntervalKm: vehicle.oilIntervalKm,
+      oilIntervalMonths: vehicle.oilIntervalMonths,
+      ipvaDueDate: vehicle.ipvaDueDate,
+      licensingDueDate: vehicle.licensingDueDate,
+      photoName: photoNameOf(vehicle.photoUri),
+      fipeBrandCode: vehicle.fipeBrandCode,
+      fipeModelCode: vehicle.fipeModelCode,
+      fipeYearCode: vehicle.fipeYearCode,
+      fipeLabel: vehicle.fipeLabel,
+      createdAt: vehicle.createdAt,
+    })),
     oilChanges,
     checklists: checklists.map((checklist) => ({
       id: checklist.id,
@@ -73,6 +114,7 @@ export async function performBackup(): Promise<{ photosUploaded: number }> {
       notes: checklist.notes,
       createdAt: checklist.createdAt,
     })),
+    fipeValues,
   };
 
   const existingFiles = await listAppDataFiles();
@@ -86,6 +128,9 @@ export async function performBackup(): Promise<{ photosUploaded: number }> {
   );
 
   const photoNames = new Set<string>();
+  for (const vehicle of manifest.vehicles) {
+    if (vehicle.photoName) photoNames.add(vehicle.photoName);
+  }
   for (const checklist of manifest.checklists) {
     if (checklist.tirePhotoName) photoNames.add(checklist.tirePhotoName);
     if (checklist.waterPhotoName) photoNames.add(checklist.waterPhotoName);
@@ -121,7 +166,7 @@ export async function performRestore(): Promise<{ photosRestored: number }> {
   const filesByName = new Map(existingFiles.map((file) => [file.name, file.id]));
   let photosRestored = 0;
 
-  async function restorePhoto(name: string | null): Promise<string | null> {
+  async function restorePhoto(name: string | null | undefined): Promise<string | null> {
     if (!name) return null;
     const destination = new File(photosDirectory, name);
     if (!destination.exists) {
@@ -138,7 +183,26 @@ export async function performRestore(): Promise<{ photosRestored: number }> {
   await deleteAllVehicles();
 
   for (const vehicle of manifest.vehicles) {
-    await insertVehicleRaw(vehicle);
+    const restored: Vehicle = {
+      id: vehicle.id,
+      name: vehicle.name,
+      type: vehicle.type,
+      plate: vehicle.plate,
+      renavam: vehicle.renavam,
+      uf: vehicle.uf,
+      odometer: vehicle.odometer,
+      oilIntervalKm: vehicle.oilIntervalKm,
+      oilIntervalMonths: vehicle.oilIntervalMonths,
+      ipvaDueDate: vehicle.ipvaDueDate,
+      licensingDueDate: vehicle.licensingDueDate,
+      photoUri: await restorePhoto(vehicle.photoName),
+      fipeBrandCode: vehicle.fipeBrandCode ?? null,
+      fipeModelCode: vehicle.fipeModelCode ?? null,
+      fipeYearCode: vehicle.fipeYearCode ?? null,
+      fipeLabel: vehicle.fipeLabel ?? null,
+      createdAt: vehicle.createdAt,
+    };
+    await insertVehicleRaw(restored);
   }
   for (const oilChange of manifest.oilChanges) {
     await insertOilChangeRaw(oilChange);
@@ -158,6 +222,9 @@ export async function performRestore(): Promise<{ photosRestored: number }> {
       createdAt: checklist.createdAt,
     };
     await insertChecklistRaw(restored);
+  }
+  for (const entry of manifest.fipeValues ?? []) {
+    await insertFipeValueRaw(entry);
   }
 
   return { photosRestored };
