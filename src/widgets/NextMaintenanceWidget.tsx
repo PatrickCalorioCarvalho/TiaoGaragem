@@ -6,8 +6,9 @@ interface NextMaintenanceWidgetProps {
 }
 
 export function NextMaintenanceWidget({ info }: NextMaintenanceWidgetProps) {
-  const hasPhoto = Boolean(info?.photoDataUri);
+  const hasPhoto = Boolean(info?.photo);
   const textColor = hasPhoto ? '#FFFFFF' : '#1C1F26';
+  const mutedTextColor = hasPhoto ? 'rgba(255, 255, 255, 0.85)' : '#6B7280';
 
   return (
     <OverlapWidget
@@ -15,11 +16,11 @@ export function NextMaintenanceWidget({ info }: NextMaintenanceWidgetProps) {
       clickActionData={info ? { uri: `tiaogaragem://vehicle/${info.vehicleId}` } : undefined}
       style={{ height: 'match_parent', width: 'match_parent', borderRadius: 16, overflow: 'hidden' }}
     >
-      {info?.photoDataUri ? (
+      {info?.photo ? (
         <ImageWidget
-          image={info.photoDataUri as `data:image${string}`}
-          imageWidth={320}
-          imageHeight={200}
+          image={info.photo.uri as `data:image${string}`}
+          imageWidth={info.photo.width}
+          imageHeight={info.photo.height}
           resizeMode="cover"
           style={{ height: 'match_parent', width: 'match_parent' }}
         />
@@ -31,30 +32,28 @@ export function NextMaintenanceWidget({ info }: NextMaintenanceWidgetProps) {
         style={{
           height: 'match_parent',
           width: 'match_parent',
-          backgroundColor: hasPhoto ? 'rgba(0, 0, 0, 0.45)' : 'rgba(0, 0, 0, 0)',
+          backgroundColor: hasPhoto ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0)',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 16,
+          justifyContent: 'space-between',
+          padding: 14,
         }}
       >
-        <TextWidget text="TiaoGaragem" style={{ fontSize: 11, color: textColor }} />
+        <TextWidget
+          text={info?.vehicleName ?? 'TiaoGaragem'}
+          style={{ fontSize: 22, fontWeight: 'bold', color: textColor }}
+          maxLines={1}
+        />
+
         {info ? (
-          <FlexWidget style={{ flexDirection: 'column', alignItems: 'center', marginTop: 4 }}>
-            <TextWidget
-              text={info.vehicleName}
-              style={{ fontSize: 18, fontWeight: 'bold', color: textColor, textAlign: 'center' }}
-              maxLines={1}
-            />
-            <TextWidget
-              text={`${info.title} · ${info.detail}`}
-              style={{ fontSize: 13, color: textColor, marginTop: 2, textAlign: 'center' }}
-              maxLines={2}
-            />
+          <FlexWidget style={{ flexDirection: 'column' }}>
+            <TextWidget text={info.title} style={{ fontSize: 15, fontWeight: 'bold', color: textColor }} maxLines={1} />
+            <TextWidget text={info.detail} style={{ fontSize: 14, color: mutedTextColor, marginTop: 2 }} maxLines={2} />
           </FlexWidget>
         ) : (
-          <TextWidget text="Tudo em dia por aqui" style={{ fontSize: 16, color: textColor, marginTop: 4 }} />
+          <TextWidget text="Tudo em dia por aqui" style={{ fontSize: 16, color: textColor }} />
         )}
+
+        {info && <TextWidget text="TiaoGaragem" style={{ fontSize: 11, color: mutedTextColor }} />}
       </FlexWidget>
     </OverlapWidget>
   );

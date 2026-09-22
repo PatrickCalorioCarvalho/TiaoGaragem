@@ -52,7 +52,7 @@
               "name": "NextMaintenance",
               "label": "Próxima manutenção",
               "minWidth": "250dp",
-              "minHeight": "110dp",
+              "minHeight": "180dp",
               "description": "Mostra o veículo com a manutenção mais urgente",
               "updatePeriodMillis": 3600000
             }

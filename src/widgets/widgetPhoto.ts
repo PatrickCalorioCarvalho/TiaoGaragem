@@ -2,7 +2,13 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 
 const WIDGET_PHOTO_WIDTH = 320;
 
-export async function getWidgetPhotoDataUri(photoUri: string | null): Promise<string | null> {
+export interface WidgetPhoto {
+  uri: string;
+  width: number;
+  height: number;
+}
+
+export async function getWidgetPhoto(photoUri: string | null): Promise<WidgetPhoto | null> {
   if (!photoUri) return null;
   try {
     const context = ImageManipulator.manipulate(photoUri);
@@ -13,7 +19,8 @@ export async function getWidgetPhotoDataUri(photoUri: string | null): Promise<st
       compress: 0.5,
       base64: true,
     });
-    return result.base64 ? `data:image/jpeg;base64,${result.base64}` : null;
+    if (!result.base64) return null;
+    return { uri: `data:image/jpeg;base64,${result.base64}`, width: result.width, height: result.height };
   } catch {
     return null;
   }

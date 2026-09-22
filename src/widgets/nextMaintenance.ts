@@ -2,7 +2,7 @@ import { listVehicles } from '../db/vehicles';
 import { getLastOilChange } from '../db/oilChanges';
 import { getLastChecklist } from '../db/checklists';
 import { getOilChangeState, getChecklistState, getDocumentState } from '../utils/status';
-import { getWidgetPhotoDataUri } from './widgetPhoto';
+import { getWidgetPhoto, type WidgetPhoto } from './widgetPhoto';
 import type { ChecklistState, DocumentState, MaintenanceState } from '../types';
 
 export interface NextMaintenanceInfo {
@@ -10,10 +10,10 @@ export interface NextMaintenanceInfo {
   vehicleName: string;
   title: string;
   detail: string;
-  photoDataUri: string | null;
+  photo: WidgetPhoto | null;
 }
 
-interface Candidate extends Omit<NextMaintenanceInfo, 'photoDataUri'> {
+interface Candidate extends Omit<NextMaintenanceInfo, 'photo'> {
   photoUri: string | null;
   rank: number;
   urgencyScore: number;
@@ -121,12 +121,12 @@ export async function computeNextMaintenance(): Promise<NextMaintenanceInfo | nu
 
   candidates.sort((a, b) => b.rank - a.rank || a.urgencyScore - b.urgencyScore);
   const [best] = candidates;
-  const photoDataUri = await getWidgetPhotoDataUri(best.photoUri);
+  const photo = await getWidgetPhoto(best.photoUri);
   return {
     vehicleId: best.vehicleId,
     vehicleName: best.vehicleName,
     title: best.title,
     detail: best.detail,
-    photoDataUri,
+    photo,
   };
 }
