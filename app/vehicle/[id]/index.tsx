@@ -107,11 +107,13 @@ export default function VehicleDetailScreen() {
       <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 24 }]}>
         <Card style={styles.headerCard}>
           {vehicle.photoUri ? (
-            <Image source={{ uri: vehicle.photoUri }} style={styles.vehiclePhoto} />
+            <Image source={{ uri: vehicle.photoUri }} style={styles.heroPhoto} />
           ) : (
-            <MaterialCommunityIcons name={vehicleTypeIcon(vehicle.type)} size={32} color={colors.primary} />
+            <View style={styles.heroPhotoPlaceholder}>
+              <MaterialCommunityIcons name={vehicleTypeIcon(vehicle.type)} size={56} color={colors.primary} />
+            </View>
           )}
-          <View style={{ flex: 1 }}>
+          <View style={styles.headerTextBlock}>
             <Text style={styles.vehicleName}>{vehicle.name}</Text>
             <Text style={styles.vehicleMeta}>
               {vehicleTypeLabel(vehicle.type)}
@@ -257,15 +259,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    padding: 0,
+    overflow: 'hidden',
   },
-  vehiclePhoto: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
+  heroPhoto: {
+    width: '100%',
+    height: 200,
     backgroundColor: colors.neutralBg,
+  },
+  heroPhotoPlaceholder: {
+    width: '100%',
+    height: 140,
+    backgroundColor: colors.neutralBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTextBlock: {
+    padding: 16,
   },
   vehicleName: {
     fontSize: 20,

@@ -234,14 +234,14 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   vehiclePhoto: {
-    width: 96,
-    height: 96,
+    width: 112,
+    height: 112,
     borderRadius: 12,
     backgroundColor: colors.neutralBg,
   },
   vehiclePhotoPlaceholder: {
-    width: 96,
-    height: 96,
+    width: 112,
+    height: 112,
     borderRadius: 12,
     backgroundColor: colors.neutralBg,
     alignItems: 'center',
