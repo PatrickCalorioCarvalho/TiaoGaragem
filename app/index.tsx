@@ -133,7 +133,7 @@ export default function VehicleListScreen() {
           renderItem={({ item }) => (
             <Pressable onPress={() => router.push(`/vehicle/${item.vehicle.id}`)}>
               <Card style={styles.card}>
-                <View style={styles.cardRow}>
+                <View style={styles.cardHeader}>
                   {item.vehicle.photoUri ? (
                     <Image source={{ uri: item.vehicle.photoUri }} style={styles.vehiclePhoto} />
                   ) : (
@@ -145,21 +145,23 @@ export default function VehicleListScreen() {
                       />
                     </View>
                   )}
-                  <View style={styles.cardDetails}>
+                  <View style={styles.cardHeaderText}>
                     <Text style={styles.vehicleName}>{item.vehicle.name}</Text>
                     {item.vehicle.plate ? <Text style={styles.vehiclePlate}>{item.vehicle.plate}</Text> : null}
-                    <View style={styles.detailRow}>
-                      <Text style={styles.badgeCaption}>Óleo</Text>
-                      <StatusBadge label={item.oilLabel} kind={item.oilKind} />
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.badgeCaption}>Checklist</Text>
-                      <StatusBadge label={item.checklistLabel} kind={item.checklistKind} />
-                    </View>
-                    <View style={styles.detailRow}>
-                      <Text style={styles.badgeCaption}>Documentos</Text>
-                      <StatusBadge label={item.documentsLabel} kind={item.documentsKind} />
-                    </View>
+                  </View>
+                </View>
+                <View style={styles.badgeRow}>
+                  <View style={styles.badgeGroup}>
+                    <Text style={styles.badgeCaption}>Óleo</Text>
+                    <StatusBadge label={item.oilLabel} kind={item.oilKind} />
+                  </View>
+                  <View style={styles.badgeGroup}>
+                    <Text style={styles.badgeCaption}>Checklist</Text>
+                    <StatusBadge label={item.checklistLabel} kind={item.checklistKind} />
+                  </View>
+                  <View style={styles.badgeGroup}>
+                    <Text style={styles.badgeCaption}>Documentos</Text>
+                    <StatusBadge label={item.documentsLabel} kind={item.documentsKind} />
                   </View>
                 </View>
               </Card>
@@ -220,29 +222,26 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    padding: 0,
-    overflow: 'hidden',
+    gap: 14,
   },
-  cardRow: {
+  cardHeader: {
     flexDirection: 'row',
-    alignItems: 'stretch',
+    alignItems: 'center',
+    gap: 12,
   },
-  cardDetails: {
+  cardHeaderText: {
     flex: 1,
-    padding: 14,
-    gap: 6,
-    justifyContent: 'center',
   },
   vehiclePhoto: {
-    width: 112,
-    minHeight: 112,
-    alignSelf: 'stretch',
+    width: 88,
+    height: 88,
+    borderRadius: 14,
     backgroundColor: colors.neutralBg,
   },
   vehiclePhotoPlaceholder: {
-    width: 112,
-    minHeight: 112,
-    alignSelf: 'stretch',
+    width: 88,
+    height: 88,
+    borderRadius: 14,
     backgroundColor: colors.neutralBg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -255,17 +254,19 @@ const styles = StyleSheet.create({
   vehiclePlate: {
     fontSize: 14,
     color: colors.textMuted,
-    marginBottom: 2,
+    marginTop: 2,
   },
-  detailRow: {
+  badgeRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    gap: 12,
+  },
+  badgeGroup: {
+    flex: 1,
+    gap: 4,
   },
   badgeCaption: {
     fontSize: 12,
     color: colors.textMuted,
-    width: 72,
   },
   grid: {
     padding: 16,
