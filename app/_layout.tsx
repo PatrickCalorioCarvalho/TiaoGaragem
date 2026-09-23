@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StatusBar, View } from 'react-native';
+import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { getDb } from '../src/db/database';
 import { colors } from '../src/theme/colors';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    getDb().then(() => setReady(true));
+    getDb().then(() => {
+      setReady(true);
+      SplashScreen.hideAsync().catch(() => {});
+    });
   }, []);
 
   if (!ready) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
+    return null;
   }
 
   return (
