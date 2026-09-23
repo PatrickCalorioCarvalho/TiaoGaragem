@@ -70,7 +70,7 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 220,
           "resizeMode": "contain",
-          "backgroundColor": "#2563EB"
+          "backgroundColor": "#4B5563"
         }
       ]
     ],
