@@ -14,6 +14,7 @@ interface ChecklistRow {
   water_photo_uri: string | null;
   oil_status: ItemStatus;
   oil_photo_uri: string | null;
+  odometer: number | null;
   notes: string | null;
   created_at: string;
 }
@@ -29,6 +30,7 @@ function mapRow(row: ChecklistRow): Checklist {
     waterPhotoUri: row.water_photo_uri,
     oilStatus: row.oil_status,
     oilPhotoUri: row.oil_photo_uri,
+    odometer: row.odometer,
     notes: row.notes,
     createdAt: row.created_at,
   };
@@ -42,6 +44,7 @@ export interface NewChecklistInput {
   waterPhotoUri: string | null;
   oilStatus: ItemStatus;
   oilPhotoUri: string | null;
+  odometer: number | null;
   notes?: string;
 }
 
@@ -70,8 +73,8 @@ export async function createChecklist(vehicleId: string, input: NewChecklistInpu
 
   await db.runAsync(
     `INSERT INTO checklists (
-       id, vehicle_id, date, tire_status, tire_photo_uri, water_status, water_photo_uri, oil_status, oil_photo_uri, notes, created_at
-     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       id, vehicle_id, date, tire_status, tire_photo_uri, water_status, water_photo_uri, oil_status, oil_photo_uri, odometer, notes, created_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       vehicleId,
@@ -82,6 +85,7 @@ export async function createChecklist(vehicleId: string, input: NewChecklistInpu
       input.waterPhotoUri,
       input.oilStatus,
       input.oilPhotoUri,
+      input.odometer,
       input.notes ?? null,
       createdAt,
     ],
@@ -97,6 +101,7 @@ export async function createChecklist(vehicleId: string, input: NewChecklistInpu
     waterPhotoUri: input.waterPhotoUri,
     oilStatus: input.oilStatus,
     oilPhotoUri: input.oilPhotoUri,
+    odometer: input.odometer,
     notes: input.notes ?? null,
     createdAt,
   };
@@ -120,8 +125,8 @@ export async function insertChecklistRaw(checklist: Checklist): Promise<void> {
   const db = await getDb();
   await db.runAsync(
     `INSERT INTO checklists (
-       id, vehicle_id, date, tire_status, tire_photo_uri, water_status, water_photo_uri, oil_status, oil_photo_uri, notes, created_at
-     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       id, vehicle_id, date, tire_status, tire_photo_uri, water_status, water_photo_uri, oil_status, oil_photo_uri, odometer, notes, created_at
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       checklist.id,
       checklist.vehicleId,
@@ -132,6 +137,7 @@ export async function insertChecklistRaw(checklist: Checklist): Promise<void> {
       checklist.waterPhotoUri,
       checklist.oilStatus,
       checklist.oilPhotoUri,
+      checklist.odometer,
       checklist.notes,
       checklist.createdAt,
     ],

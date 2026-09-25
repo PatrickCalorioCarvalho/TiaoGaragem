@@ -71,6 +71,7 @@ async function migrate(db: SQLite.SQLiteDatabase) {
   await ensureColumn(db, 'vehicles', 'fipe_model_code', 'TEXT');
   await ensureColumn(db, 'vehicles', 'fipe_year_code', 'TEXT');
   await ensureColumn(db, 'vehicles', 'fipe_label', 'TEXT');
+  await ensureColumn(db, 'checklists', 'odometer', 'INTEGER');
 }
 
 async function ensureColumn(

@@ -19,6 +19,7 @@ interface BackupChecklist {
   waterPhotoName: string | null;
   oilStatus: ItemStatus;
   oilPhotoName: string | null;
+  odometer: number | null;
   notes: string | null;
   createdAt: string;
 }
@@ -111,6 +112,7 @@ export async function performBackup(): Promise<{ photosUploaded: number }> {
       waterPhotoName: photoNameOf(checklist.waterPhotoUri),
       oilStatus: checklist.oilStatus,
       oilPhotoName: photoNameOf(checklist.oilPhotoUri),
+      odometer: checklist.odometer,
       notes: checklist.notes,
       createdAt: checklist.createdAt,
     })),
@@ -218,6 +220,7 @@ export async function performRestore(): Promise<{ photosRestored: number }> {
       waterPhotoUri: await restorePhoto(checklist.waterPhotoName),
       oilStatus: checklist.oilStatus,
       oilPhotoUri: await restorePhoto(checklist.oilPhotoName),
+      odometer: checklist.odometer ?? null,
       notes: checklist.notes,
       createdAt: checklist.createdAt,
     };

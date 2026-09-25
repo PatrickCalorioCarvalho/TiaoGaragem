@@ -51,6 +51,7 @@ export interface Checklist {
   waterPhotoUri: string | null;
   oilStatus: ItemStatus;
   oilPhotoUri: string | null;
+  odometer: number | null;
   notes: string | null;
   createdAt: string;
 }
