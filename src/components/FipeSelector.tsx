@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import type { ThemeColors } from '../theme/colors';
 import { listBrands, listModels, listYears, type FipeOption } from '../api/fipe';
 import type { VehicleType } from '../types';
 
@@ -22,6 +23,8 @@ interface FipeSelectorProps {
 }
 
 export function FipeSelector({ vehicleType, currentLabel, onChange, onClear }: FipeSelectorProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [editing, setEditing] = useState(!currentLabel);
   const [brands, setBrands] = useState<FipeOption[]>([]);
   const [models, setModels] = useState<FipeOption[]>([]);
@@ -160,49 +163,51 @@ export function FipeSelector({ vehicleType, currentLabel, onChange, onClear }: F
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  hint: {
-    fontSize: 12,
-    color: colors.textMuted,
-    marginBottom: 6,
-  },
-  pickerWrapper: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  spaced: {
-    marginTop: 8,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  summaryLabel: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.text,
-  },
-  link: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  error: {
-    fontSize: 12,
-    color: colors.critico,
-    marginTop: 6,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 2,
+    },
+    hint: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginBottom: 6,
+    },
+    pickerWrapper: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      overflow: 'hidden',
+    },
+    spaced: {
+      marginTop: 8,
+    },
+    summaryRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
+    },
+    summaryLabel: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
+    },
+    link: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    error: {
+      fontSize: 12,
+      color: colors.critico,
+      marginTop: 6,
+    },
+  });
+}

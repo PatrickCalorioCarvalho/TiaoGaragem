@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { VehicleForm } from '../../../src/components/VehicleForm';
 import { deleteVehicle, getVehicle, NewVehicleInput, updateVehicle } from '../../../src/db/vehicles';
 import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
-import { colors } from '../../../src/theme/colors';
+import { useTheme } from '../../../src/theme/ThemeContext';
 import {
   cancelDocumentReminders,
   ipvaMetadataKey,
@@ -15,6 +15,7 @@ import type { Vehicle } from '../../../src/types';
 export default function EditVehicleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { colors } = useTheme();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
 
   useEffect(() => {

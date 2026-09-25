@@ -9,7 +9,8 @@ import { FormField } from '../../src/components/FormField';
 import { PhotoField } from '../../src/components/PhotoField';
 import { UfPicker } from '../../src/components/UfPicker';
 import { VehicleTypePicker } from '../../src/components/VehicleTypePicker';
-import { colors } from '../../src/theme/colors';
+import { useTheme } from '../../src/theme/ThemeContext';
+import type { ThemeColors } from '../../src/theme/colors';
 import { vehicleTypeLabel } from '../../src/utils/labels';
 import { createVehicle } from '../../src/db/vehicles';
 import { refreshMaintenanceWidget } from '../../src/widgets/refreshWidget';
@@ -30,6 +31,8 @@ const GROUPS: { key: string; label: string; steps: Step[] }[] = [
 export default function NewVehicleScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [history, setHistory] = useState<Step[]>(['type']);
   const step = history[history.length - 1];
@@ -351,72 +354,74 @@ export default function NewVehicleScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.border,
-  },
-  dotActive: {
-    backgroundColor: colors.primary,
-  },
-  content: {
-    padding: 20,
-    flexGrow: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  spacedTop: {
-    marginTop: 16,
-  },
-  pickerWrapper: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  promptBox: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
-  },
-  promptText: {
-    fontSize: 13,
-    color: colors.textMuted,
-    lineHeight: 18,
-  },
-  footer: {
-    padding: 20,
-    paddingTop: 12,
-    gap: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    screen: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    dots: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 8,
+      paddingTop: 16,
+      paddingBottom: 8,
+    },
+    dot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: colors.border,
+    },
+    dotActive: {
+      backgroundColor: colors.primary,
+    },
+    content: {
+      padding: 20,
+      flexGrow: 1,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textMuted,
+      marginBottom: 16,
+      lineHeight: 20,
+    },
+    spacedTop: {
+      marginTop: 16,
+    },
+    pickerWrapper: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      overflow: 'hidden',
+    },
+    promptBox: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      padding: 12,
+      marginBottom: 12,
+    },
+    promptText: {
+      fontSize: 13,
+      color: colors.textMuted,
+      lineHeight: 18,
+    },
+    footer: {
+      padding: 20,
+      paddingTop: 12,
+      gap: 10,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.background,
+    },
+  });
+}

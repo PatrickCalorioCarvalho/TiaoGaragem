@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import type { ThemeColors } from '../theme/colors';
 
 interface ButtonProps {
   label: string;
@@ -10,6 +12,8 @@ interface ButtonProps {
 }
 
 export function Button({ label, onPress, variant = 'primary', disabled, loading }: ButtonProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const isPrimary = variant === 'primary';
   const isDanger = variant === 'danger';
 
@@ -43,32 +47,34 @@ export function Button({ label, onPress, variant = 'primary', disabled, loading 
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primary: {
-    backgroundColor: colors.primary,
-  },
-  danger: {
-    backgroundColor: colors.critico,
-  },
-  secondary: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    base: {
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primary: {
+      backgroundColor: colors.primary,
+    },
+    danger: {
+      backgroundColor: colors.critico,
+    },
+    secondary: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    disabled: {
+      opacity: 0.5,
+    },
+    pressed: {
+      opacity: 0.85,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+}

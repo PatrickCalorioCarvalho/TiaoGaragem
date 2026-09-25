@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import type { ThemeColors } from '../theme/colors';
 import { persistPhoto } from '../utils/photos';
 
 interface PhotoFieldProps {
@@ -11,6 +13,9 @@ interface PhotoFieldProps {
 }
 
 export function PhotoField({ label, uri, onChange }: PhotoFieldProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   async function pickFromCamera() {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
@@ -70,57 +75,59 @@ export function PhotoField({ label, uri, onChange }: PhotoFieldProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 6,
-    color: colors.text,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  pickButton: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 6,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pickButtonLabel: {
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  previewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  thumbnail: {
-    width: 72,
-    height: 72,
-    borderRadius: 10,
-    backgroundColor: colors.neutralBg,
-  },
-  previewActions: {
-    gap: 8,
-  },
-  smallButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  smallButtonLabel: {
-    color: colors.primary,
-    fontWeight: '600',
-    fontSize: 13,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '600',
+      marginBottom: 6,
+      color: colors.text,
+    },
+    row: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    pickButton: {
+      flex: 1,
+      flexDirection: 'row',
+      gap: 6,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    pickButtonLabel: {
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    previewRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    thumbnail: {
+      width: 72,
+      height: 72,
+      borderRadius: 10,
+      backgroundColor: colors.neutralBg,
+    },
+    previewActions: {
+      gap: 8,
+    },
+    smallButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    smallButtonLabel: {
+      color: colors.primary,
+      fontWeight: '600',
+      fontSize: 13,
+    },
+  });
+}

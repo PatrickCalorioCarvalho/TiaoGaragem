@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -7,7 +7,8 @@ import { FormField } from '../../../src/components/FormField';
 import { createOilChange } from '../../../src/db/oilChanges';
 import { getVehicle } from '../../../src/db/vehicles';
 import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
-import { colors } from '../../../src/theme/colors';
+import { useTheme } from '../../../src/theme/ThemeContext';
+import type { ThemeColors } from '../../../src/theme/colors';
 import { formatDateBR, parseDateBR, todayIso } from '../../../src/utils/date';
 import type { Vehicle } from '../../../src/types';
 
@@ -15,6 +16,8 @@ export default function OilChangeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [date, setDate] = useState(formatDateBR(todayIso()));
   const [odometer, setOdometer] = useState('');
@@ -75,18 +78,20 @@ export default function OilChangeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  loading: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginBottom: 16,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      padding: 20,
+    },
+    loading: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textMuted,
+      marginBottom: 16,
+    },
+  });
+}

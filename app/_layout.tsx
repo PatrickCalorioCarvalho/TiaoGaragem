@@ -5,11 +5,20 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { getDb } from '../src/db/database';
-import { colors } from '../src/theme/colors';
+import { ThemeProvider, useTheme } from '../src/theme/ThemeContext';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutContent />
+    </ThemeProvider>
+  );
+}
+
+function RootLayoutContent() {
+  const { colors, scheme } = useTheme();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -26,7 +35,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar barStyle="dark-content" />
+        <StatusBar barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'} />
         <Stack
           screenOptions={{
             headerStyle: { backgroundColor: colors.background },
@@ -37,7 +46,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{ title: 'TiaoGaragem' }} />
           <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
-          <Stack.Screen name="settings" options={{ title: 'Backup e conta' }} />
+          <Stack.Screen name="settings" options={{ title: 'Configurações' }} />
           <Stack.Screen name="vehicle/new" options={{ title: 'Novo veículo', presentation: 'modal' }} />
           <Stack.Screen name="vehicle/[id]/index" options={{ title: 'Veículo' }} />
           <Stack.Screen name="vehicle/[id]/edit" options={{ title: 'Editar veículo', presentation: 'modal' }} />

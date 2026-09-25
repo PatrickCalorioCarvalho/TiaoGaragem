@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -12,7 +12,8 @@ import { listOilChanges } from '../../../src/db/oilChanges';
 import { listChecklists } from '../../../src/db/checklists';
 import { listFipeValues, upsertFipeValue } from '../../../src/db/fipeValues';
 import { getPrice, parseFipeValue } from '../../../src/api/fipe';
-import { colors } from '../../../src/theme/colors';
+import { useTheme } from '../../../src/theme/ThemeContext';
+import type { ThemeColors } from '../../../src/theme/colors';
 import { formatDateBR } from '../../../src/utils/date';
 import { getChecklistState, getDocumentState, getOilChangeState } from '../../../src/utils/status';
 import {
@@ -40,6 +41,8 @@ export default function VehicleDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [oilChanges, setOilChanges] = useState<OilChange[]>([]);
   const [checklists, setChecklists] = useState<Checklist[]>([]);
@@ -233,6 +236,8 @@ function ChecklistItemPreview({
   status: Checklist['tireStatus'];
   photoUri: string | null;
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <View style={styles.itemPreview}>
       {photoUri ? (
@@ -248,110 +253,112 @@ function ChecklistItemPreview({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 12,
-  },
-  loading: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerCard: {
-    padding: 0,
-    overflow: 'hidden',
-  },
-  heroPhoto: {
-    width: '100%',
-    height: 200,
-    backgroundColor: colors.neutralBg,
-  },
-  heroPhotoPlaceholder: {
-    width: '100%',
-    height: 140,
-    backgroundColor: colors.neutralBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTextBlock: {
-    padding: 16,
-  },
-  vehicleName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  vehicleMeta: {
-    fontSize: 13,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  statusCard: {
-    gap: 10,
-  },
-  statusHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  statusTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  statusDetail: {
-    fontSize: 13,
-    color: colors.textMuted,
-    lineHeight: 19,
-  },
-  documentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  section: {
-    marginTop: 8,
-    gap: 10,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  historyCard: {
-    gap: 8,
-  },
-  historyDate: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  historyNotes: {
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  checklistRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  itemPreview: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 6,
-  },
-  itemThumbnail: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-    backgroundColor: colors.neutralBg,
-  },
-  itemThumbnailEmpty: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      padding: 16,
+      gap: 12,
+    },
+    loading: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerCard: {
+      padding: 0,
+      overflow: 'hidden',
+    },
+    heroPhoto: {
+      width: '100%',
+      height: 200,
+      backgroundColor: colors.neutralBg,
+    },
+    heroPhotoPlaceholder: {
+      width: '100%',
+      height: 140,
+      backgroundColor: colors.neutralBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    headerTextBlock: {
+      padding: 16,
+    },
+    vehicleName: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    vehicleMeta: {
+      fontSize: 13,
+      color: colors.textMuted,
+      marginTop: 2,
+    },
+    statusCard: {
+      gap: 10,
+    },
+    statusHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    statusTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    statusDetail: {
+      fontSize: 13,
+      color: colors.textMuted,
+      lineHeight: 19,
+    },
+    documentRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    section: {
+      marginTop: 8,
+      gap: 10,
+    },
+    sectionTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    historyCard: {
+      gap: 8,
+    },
+    historyDate: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    historyNotes: {
+      fontSize: 13,
+      color: colors.textMuted,
+    },
+    checklistRow: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    itemPreview: {
+      flex: 1,
+      alignItems: 'center',
+      gap: 6,
+    },
+    itemThumbnail: {
+      width: 56,
+      height: 56,
+      borderRadius: 8,
+      backgroundColor: colors.neutralBg,
+    },
+    itemThumbnailEmpty: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    itemLabel: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+  });
+}

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import type { ThemeColors } from '../theme/colors';
 import type { FipeValue } from '../types';
 
 interface FipeChartProps {
@@ -24,6 +25,8 @@ function formatMonth(referenceMonth: string): string {
 }
 
 export function FipeChart({ data }: FipeChartProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [width, setWidth] = useState(0);
 
   if (data.length < 2) {
@@ -81,31 +84,33 @@ export function FipeChart({ data }: FipeChartProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    gap: 4,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-  },
-  currentValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  trend: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.textMuted,
-  },
-  axisRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  axisLabel: {
-    fontSize: 11,
-    color: colors.textMuted,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      gap: 4,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: 8,
+    },
+    currentValue: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    trend: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.textMuted,
+    },
+    axisRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    axisLabel: {
+      fontSize: 11,
+      color: colors.textMuted,
+    },
+  });
+}

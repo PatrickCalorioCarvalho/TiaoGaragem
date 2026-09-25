@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -7,7 +7,8 @@ import { FormField } from '../../../src/components/FormField';
 import { getVehicle, updateVehicleDocuments } from '../../../src/db/vehicles';
 import { refreshMaintenanceWidget } from '../../../src/widgets/refreshWidget';
 import { findState } from '../../../src/data/brazilStates';
-import { colors } from '../../../src/theme/colors';
+import { useTheme } from '../../../src/theme/ThemeContext';
+import type { ThemeColors } from '../../../src/theme/colors';
 import { formatDateBR, parseDateBR } from '../../../src/utils/date';
 import {
   ipvaMetadataKey,
@@ -20,6 +21,8 @@ export default function DocumentsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [ipvaDueDate, setIpvaDueDate] = useState('');
   const [licensingDueDate, setLicensingDueDate] = useState('');
@@ -125,26 +128,28 @@ export default function DocumentsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-  },
-  loading: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.textMuted,
-    marginBottom: 16,
-    lineHeight: 18,
-  },
-  hint: {
-    fontSize: 13,
-    color: colors.textMuted,
-  },
-  actions: {
-    marginTop: 16,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      padding: 20,
+    },
+    loading: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    subtitle: {
+      fontSize: 13,
+      color: colors.textMuted,
+      marginBottom: 16,
+      lineHeight: 18,
+    },
+    hint: {
+      fontSize: 13,
+      color: colors.textMuted,
+    },
+    actions: {
+      marginTop: 16,
+    },
+  });
+}

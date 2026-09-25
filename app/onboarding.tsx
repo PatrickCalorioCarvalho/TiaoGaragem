@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -7,12 +7,15 @@ import { Card } from '../src/components/Card';
 import { useGoogleSignIn } from '../src/auth/useGoogleSignIn';
 import { getBackupInfo, performRestore } from '../src/backup/backup';
 import { ONBOARDING_DONE_KEY, setMetadata } from '../src/db/metadata';
-import { colors } from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
+import type { ThemeColors } from '../src/theme/colors';
 
 type Step = 'welcome' | 'checking' | 'backup-found' | 'no-backup' | 'restoring';
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [step, setStep] = useState<Step>('welcome');
   const [email, setEmail] = useState<string | null>(null);
   const [backupInfo, setBackupInfo] = useState<{ exportedAt: string; vehicleCount: number } | null>(null);
@@ -114,42 +117,44 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 20,
-    justifyContent: 'center',
-    gap: 16,
-  },
-  hero: {
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.textMuted,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  card: {
-    gap: 12,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  cardBody: {
-    fontSize: 14,
-    color: colors.textMuted,
-    lineHeight: 20,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 20,
+      justifyContent: 'center',
+      gap: 16,
+    },
+    hero: {
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 8,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      textAlign: 'center',
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    card: {
+      gap: 12,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    cardBody: {
+      fontSize: 14,
+      color: colors.textMuted,
+      lineHeight: 20,
+    },
+  });
+}

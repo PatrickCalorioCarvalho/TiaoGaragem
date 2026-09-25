@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Button } from '../src/components/Button';
@@ -10,13 +10,17 @@ import { performBackup, performRestore } from '../src/backup/backup';
 import { getMetadata, LAST_BACKUP_AT_KEY, setMetadata } from '../src/db/metadata';
 import { isChecklistReminderEnabled, setChecklistReminderEnabled } from '../src/notifications/checklistReminder';
 import { isGoogleConfigured } from '../src/config/google';
-import { colors } from '../src/theme/colors';
+import { useTheme, type ThemePreference } from '../src/theme/ThemeContext';
+import type { ThemeColors } from '../src/theme/colors';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}>
+      <ThemeCard />
       <ChecklistReminderCard />
       {isGoogleConfigured() ? (
         <GoogleBackupSettings />
@@ -33,7 +37,41 @@ export default function SettingsScreen() {
   );
 }
 
+const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
+  { value: 'system', label: 'Sistema' },
+  { value: 'light', label: 'Claro' },
+  { value: 'dark', label: 'Escuro' },
+];
+
+function ThemeCard() {
+  const { colors, preference, setPreference } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <Card style={styles.card}>
+      <Text style={styles.title}>Aparência</Text>
+      <Text style={styles.body}>Escolha entre o tema claro, escuro, ou siga o que estiver configurado no Android.</Text>
+      <View style={styles.themeOptions}>
+        {THEME_OPTIONS.map((option) => {
+          const selected = preference === option.value;
+          return (
+            <Pressable
+              key={option.value}
+              onPress={() => setPreference(option.value)}
+              style={[styles.themeOption, selected && styles.themeOptionSelected]}
+            >
+              <Text style={[styles.themeOptionText, selected && styles.themeOptionTextSelected]}>{option.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </Card>
+  );
+}
+
 function ChecklistReminderCard() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [enabled, setEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -83,6 +121,8 @@ function ChecklistReminderCard() {
 }
 
 function GoogleBackupSettings() {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [email, setEmail] = useState<string | null>(null);
   const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -191,32 +231,58 @@ function GoogleBackupSettings() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 12,
-  },
-  card: {
-    gap: 12,
-  },
-  reminderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  reminderText: {
-    flex: 1,
-    gap: 4,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  body: {
-    fontSize: 14,
-    color: colors.textMuted,
-    lineHeight: 20,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      padding: 16,
+      gap: 12,
+    },
+    card: {
+      gap: 12,
+    },
+    reminderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    reminderText: {
+      flex: 1,
+      gap: 4,
+    },
+    themeOptions: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    themeOption: {
+      flex: 1,
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    themeOptionSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    themeOptionText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    themeOptionTextSelected: {
+      color: colors.primaryText,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    body: {
+      fontSize: 14,
+      color: colors.textMuted,
+      lineHeight: 20,
+    },
+  });
+}

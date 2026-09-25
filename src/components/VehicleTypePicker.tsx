@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
+import type { ThemeColors } from '../theme/colors';
 import { vehicleTypeIcon, vehicleTypeLabel } from '../utils/labels';
 import type { VehicleType } from '../types';
 
@@ -12,6 +14,9 @@ interface VehicleTypePickerProps {
 const OPTIONS: VehicleType[] = ['car', 'moto'];
 
 export function VehicleTypePicker({ value, onChange }: VehicleTypePickerProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Tipo</Text>
@@ -40,37 +45,39 @@ export function VehicleTypePicker({ value, onChange }: VehicleTypePickerProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  option: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 8,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: '#EFF4FF',
-  },
-  optionLabel: {
-    fontSize: 14,
-    color: colors.textMuted,
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      marginBottom: 16,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    row: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    option: {
+      flex: 1,
+      flexDirection: 'row',
+      gap: 8,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 10,
+      paddingVertical: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    optionSelected: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primarySoft,
+    },
+    optionLabel: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+  });
+}

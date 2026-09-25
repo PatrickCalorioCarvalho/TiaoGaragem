@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Link, Stack, useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card } from '../src/components/Card';
 import { StatusBadge } from '../src/components/StatusBadge';
-import { colors } from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
+import type { ThemeColors } from '../src/theme/colors';
 import { isGoogleConfigured } from '../src/config/google';
 import { listVehicles } from '../src/db/vehicles';
 import { getLastOilChange } from '../src/db/oilChanges';
@@ -38,6 +39,8 @@ interface VehicleSummary {
 export default function VehicleListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [summaries, setSummaries] = useState<VehicleSummary[] | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
 
@@ -207,137 +210,139 @@ export default function VehicleListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 18,
-  },
-  list: {
-    padding: 16,
-    gap: 12,
-  },
-  card: {
-    padding: 14,
-  },
-  cardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
-  cardDetails: {
-    flex: 1,
-    gap: 6,
-  },
-  vehiclePhoto: {
-    width: 112,
-    height: 112,
-    borderRadius: 12,
-    backgroundColor: colors.neutralBg,
-  },
-  vehiclePhotoPlaceholder: {
-    width: 112,
-    height: 112,
-    borderRadius: 12,
-    backgroundColor: colors.neutralBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  vehicleName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  vehiclePlate: {
-    fontSize: 14,
-    color: colors.textMuted,
-    marginBottom: 2,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 4,
-  },
-  badgeGroup: {
-    flex: 1,
-    gap: 4,
-  },
-  badgeCaption: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  grid: {
-    padding: 16,
-    gap: 12,
-  },
-  gridRow: {
-    gap: 12,
-  },
-  gridCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 10,
-    gap: 4,
-  },
-  gridPhoto: {
-    width: '100%',
-    aspectRatio: 1,
-    borderRadius: 10,
-    backgroundColor: colors.neutralBg,
-  },
-  gridPhotoPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gridName: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginTop: 4,
-  },
-  gridPlate: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  empty: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-    gap: 8,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginTop: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: colors.textMuted,
-    textAlign: 'center',
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 28,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-  },
-});
+function createStyles(colors: ThemeColors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 18,
+    },
+    list: {
+      padding: 16,
+      gap: 12,
+    },
+    card: {
+      padding: 14,
+    },
+    cardRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+    },
+    cardDetails: {
+      flex: 1,
+      gap: 6,
+    },
+    vehiclePhoto: {
+      width: 112,
+      height: 112,
+      borderRadius: 12,
+      backgroundColor: colors.neutralBg,
+    },
+    vehiclePhotoPlaceholder: {
+      width: 112,
+      height: 112,
+      borderRadius: 12,
+      backgroundColor: colors.neutralBg,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    vehicleName: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    vehiclePlate: {
+      fontSize: 14,
+      color: colors.textMuted,
+      marginBottom: 2,
+    },
+    badgeRow: {
+      flexDirection: 'row',
+      gap: 10,
+      marginTop: 4,
+    },
+    badgeGroup: {
+      flex: 1,
+      gap: 4,
+    },
+    badgeCaption: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    grid: {
+      padding: 16,
+      gap: 12,
+    },
+    gridRow: {
+      gap: 12,
+    },
+    gridCard: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 10,
+      gap: 4,
+    },
+    gridPhoto: {
+      width: '100%',
+      aspectRatio: 1,
+      borderRadius: 10,
+      backgroundColor: colors.neutralBg,
+    },
+    gridPhotoPlaceholder: {
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    gridName: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+      marginTop: 4,
+    },
+    gridPlate: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    empty: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 40,
+      gap: 8,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginTop: 8,
+    },
+    emptySubtitle: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: 'center',
+    },
+    fab: {
+      position: 'absolute',
+      right: 20,
+      bottom: 28,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      elevation: 4,
+      shadowColor: '#000',
+      shadowOpacity: 0.2,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 3 },
+    },
+  });
+}
