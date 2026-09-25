@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
 import { Button } from '../src/components/Button';
@@ -8,29 +8,81 @@ import { clearAuth, loadAuth } from '../src/auth/googleAuth';
 import { useGoogleSignIn } from '../src/auth/useGoogleSignIn';
 import { performBackup, performRestore } from '../src/backup/backup';
 import { getMetadata, LAST_BACKUP_AT_KEY, setMetadata } from '../src/db/metadata';
+import { isChecklistReminderEnabled, setChecklistReminderEnabled } from '../src/notifications/checklistReminder';
 import { isGoogleConfigured } from '../src/config/google';
 import { colors } from '../src/theme/colors';
 
 export default function SettingsScreen() {
-  if (!isGoogleConfigured()) {
-    return (
-      <View style={styles.container}>
-        <Card>
+  const insets = useSafeAreaInsets();
+
+  return (
+    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}>
+      <ChecklistReminderCard />
+      {isGoogleConfigured() ? (
+        <GoogleBackupSettings />
+      ) : (
+        <Card style={styles.card}>
           <Text style={styles.title}>Backup no Google Drive</Text>
           <Text style={styles.body}>
             Para ativar o login com Google, configure "googleAndroidClientId" em app.json com o Client ID criado no
             Google Cloud Console.
           </Text>
         </Card>
-      </View>
-    );
+      )}
+    </ScrollView>
+  );
+}
+
+function ChecklistReminderCard() {
+  const [enabled, setEnabled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      isChecklistReminderEnabled().then((value) => {
+        setEnabled(value);
+        setLoading(false);
+      });
+    }, []),
+  );
+
+  async function handleToggle(value: boolean) {
+    setSaving(true);
+    const success = await setChecklistReminderEnabled(value);
+    setEnabled(success ? value : false);
+    setSaving(false);
+    if (value && !success) {
+      Alert.alert(
+        'Notificações desativadas',
+        'Não foi possível ativar o lembrete porque as notificações estão bloqueadas para o app. Ative nas configurações do Android.',
+      );
+    }
   }
 
-  return <GoogleBackupSettings />;
+  return (
+    <Card style={styles.card}>
+      <View style={styles.reminderRow}>
+        <View style={styles.reminderText}>
+          <Text style={styles.title}>Lembrete de checklist semanal</Text>
+          <Text style={styles.body}>Um alerta todo domingo às 9h para revisar pneu, água e óleo dos veículos.</Text>
+        </View>
+        {loading ? (
+          <ActivityIndicator color={colors.primary} />
+        ) : (
+          <Switch
+            value={enabled}
+            onValueChange={handleToggle}
+            disabled={saving}
+            trackColor={{ true: colors.primary }}
+          />
+        )}
+      </View>
+    </Card>
+  );
 }
 
 function GoogleBackupSettings() {
-  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState<string | null>(null);
   const [lastBackupAt, setLastBackupAt] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -99,7 +151,7 @@ function GoogleBackupSettings() {
   }
 
   return (
-    <ScrollView contentContainerStyle={[styles.container, { paddingBottom: insets.bottom + 32 }]}>
+    <>
       <Card style={styles.card}>
         <Text style={styles.title}>Conta Google</Text>
         {checkingAuth ? (
@@ -135,7 +187,7 @@ function GoogleBackupSettings() {
           />
         </Card>
       )}
-    </ScrollView>
+    </>
   );
 }
 
@@ -146,6 +198,16 @@ const styles = StyleSheet.create({
   },
   card: {
     gap: 12,
+  },
+  reminderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  reminderText: {
+    flex: 1,
+    gap: 4,
   },
   title: {
     fontSize: 16,
